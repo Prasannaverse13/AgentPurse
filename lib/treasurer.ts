@@ -139,7 +139,7 @@ export async function ask(question: string, history: Turn[] = []): Promise<{ rep
     const res = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ model: MODEL, messages, tools }),
+      body: JSON.stringify({ model: MODEL, messages, tools, reasoning_effort: 'none' }),
       signal: AbortSignal.timeout(45_000),
     }).catch(() => null);
     if (!res) return { reply: `Could not reach OpenAI. Here is the plain view:\n${fallback()}`, steps, mode: 'heuristic' };
