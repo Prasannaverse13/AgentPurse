@@ -23,6 +23,7 @@ export default function Sidebar() {
   const { data } = useApi<State>('/state', 4000);
   const pending = data?.pending.length ?? 0;
   const mode = data?.mode;
+  const { data: me } = useApi<{ email: string; name: string; demo: boolean } | null>('/auth/me', 0);
 
   return (
     <aside className="side">
@@ -39,6 +40,13 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="card" style={{ marginTop: 'auto', padding: 16 }}>
+        {me && (
+          <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid var(--color-line)' }}>
+            <div className="caption">Your PayPal</div>
+            <div className="small ink" style={{ fontWeight: 500, marginTop: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={me.email}>{me.demo ? 'Demo account' : me.email || me.name}</div>
+            <a href="/api/auth/logout" className="small" style={{ display: 'inline-block', marginTop: 6, textDecoration: 'underline', textUnderlineOffset: 3 }}>Log out</a>
+          </div>
+        )}
         <div className="caption">PayPal</div>
         <div className="row gap-8" style={{ marginTop: 6 }}>
           <span className={`dot ${mode?.paypal === 'mock' ? '' : 'dot-ink'}`} />
