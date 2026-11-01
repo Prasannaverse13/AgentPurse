@@ -29,8 +29,10 @@ export const POST = handle(async (req: Request) => {
 
   // Real PayPal calls must pass signature check. Mock mode (no keys) accepts calls so the demo can fire test events.
   if (paypalMode() !== 'mock' && !(await verifyWebhook(req.headers, event))) {
+    console.warn('paypal webhook rejected (signature)', event.event_type, event.id);
     return json({ error: 'Signature check failed. Set PAYPAL_WEBHOOK_ID.' }, 401);
   }
+  console.log('paypal webhook accepted', event.event_type, event.id);
 
   const type = event.event_type || '';
   if (!type.startsWith('PAYMENT.PAYOUTS-ITEM.')) return json({ ok: true, ignored: type });
