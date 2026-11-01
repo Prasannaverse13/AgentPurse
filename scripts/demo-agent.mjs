@@ -76,23 +76,28 @@ async function scripted() {
   if (b.error) throw new Error(b.error);
   say('agent', `Budget: $${b.leftToday} left today, auto approve up to $${b.autoApproveLimit}. Shops: ${b.allowedShops.join(', ')}`);
 
+  const rank = { auto: 0, ask: 1, block: 2 };
   for (const need of ['copy paper 10 reams', 'coffee beans 2 kg', 'standing desk']) {
     const found = await search(need);
     if (found.error) throw new Error(found.error);
-    const product = found.results?.[0];
-    if (!product) { say('agent', `Found nothing for "${need}".`); continue; }
-    const offers = [...product.offers].sort((a, c) => a.price - c.price);
-    say('agent', `Channel3 found ${product.title}. Cheapest: ${offers[0].merchant} $${offers[0].price}.`);
-    for (const offer of offers) {
-      say('agent', `Buying from ${offer.merchant} for $${offer.price}`);
-      const r = await purse('POST', '/spend', {
-        amount: offer.price, merchant: offer.merchant, item: product.title, productUrl: offer.url,
-        reason: `Restock request. ${offer === offers[0] ? 'Cheapest option found.' : 'Next cheapest option inside the rules.'}`,
-      });
-      say('purse', `${r.status?.toUpperCase()}${r.flag ? `: ${r.flag}` : ''}${r.paypal?.payoutBatchId ? ` · PayPal ${r.paypal.payoutBatchId}` : ''}`);
-      if (r.status !== 'blocked') break;
-      say('agent', 'Blocked by the owner rules. I will not work around it. Trying the next offer.');
+    const products = found.results || [];
+    if (!products.length) { say('agent', `Found nothing for "${need}".`); continue; }
+    // Best match first. Take the first product that has a shop inside my rules.
+    const byPrice = (o) => [...o].sort((x, y) => (rank[x.rules] ?? 2) - (rank[y.rules] ?? 2) || x.price - y.price);
+    const product = products.find((p) => p.offers.some((o) => o.rules !== 'block')) || products[0];
+    const offer = byPrice(product.offers)[0];
+    const cheapest = [...product.offers].sort((x, y) => x.price - y.price)[0];
+    if (offer.rules === 'block') {
+      say('agent', `Channel3 found ${product.title}. No shop inside my rules. Trying ${offer.merchant} for $${offer.price} anyway.`);
+    } else {
+      say('agent', `Channel3 found ${product.title}. Best offer inside my rules: ${offer.merchant} $${offer.price}${cheapest !== offer ? ` (cheaper at ${cheapest.merchant} $${cheapest.price} but not allowed)` : ''}.`);
     }
+    const r = await purse('POST', '/spend', {
+      amount: offer.price, merchant: offer.merchant, item: product.title, productUrl: offer.url,
+      reason: `Restock request. ${offer.rules === 'block' ? 'No shop was inside the rules.' : 'Cheapest shop that the owner rules allow.'}`,
+    });
+    say('purse', `${r.status?.toUpperCase()}${r.flag ? `: ${r.flag}` : ''}${r.paypal?.payoutBatchId ? ` · PayPal ${r.paypal.payoutBatchId}` : ''}`);
+    if (r.status === 'blocked') say('agent', 'Blocked by the owner rules. I will not work around it.');
   }
   say('agent', 'Done. Anything over the limit waits for your yes in the AgentPurse dashboard.');
 }
