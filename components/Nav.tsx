@@ -1,9 +1,20 @@
+'use client';
+
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Logo from './Logo';
 
 export default function Nav() {
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const on = () => setScrolled(window.scrollY > 60);
+    on();
+    window.addEventListener('scroll', on, { passive: true });
+    return () => window.removeEventListener('scroll', on);
+  }, []);
+
   return (
-    <div className="nav-wrap">
+    <div className={`nav-wrap${scrolled ? ' scrolled' : ''}`}>
       <div className="container">
         <nav className="nav" aria-label="Main">
           <Logo />
@@ -14,8 +25,8 @@ export default function Nav() {
             <a href="#faq">FAQ</a>
           </div>
           <div className="nav-right">
-            <Link href="/dashboard" className="btn btn-ghost btn-sm">Open dashboard</Link>
-            <Link href="/dashboard" className="btn btn-primary btn-sm">Get started</Link>
+            <Link href="/dashboard" className="btn btn-ghost btn-sm nav-open">Open dashboard</Link>
+            <Link href="/dashboard" className="btn btn-primary btn-sm nav-cta">Get started</Link>
           </div>
         </nav>
       </div>

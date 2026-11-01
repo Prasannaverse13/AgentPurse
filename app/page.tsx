@@ -3,6 +3,7 @@ import Nav from '@/components/Nav';
 import HeroDemo from '@/components/HeroDemo';
 import Faq from '@/components/Faq';
 import Logo from '@/components/Logo';
+import './landing.css';
 
 const agentsList = ['Claude', 'ChatGPT', 'Gemini', 'LangChain', 'CrewAI', 'OpenAI Agents SDK', 'Vercel AI SDK', 'Any MCP client', 'Custom REST'];
 
@@ -23,7 +24,8 @@ export default function Home() {
       <main>
         {/* HERO */}
         <section className="hero">
-          <div className="container">
+          <div className="hero-top">
+           <div className="container">
             <div className="rating fade-up">
               <span className="stars" aria-hidden>★★★★★</span>
               Built on PayPal. Ready for any MCP agent.
@@ -34,7 +36,7 @@ export default function Home() {
               Small buys go through. Risky ones wait for your yes.
             </p>
             <form className="hero-form fade-up d3" action="/dashboard">
-              <input className="input" type="email" placeholder="Your work email" aria-label="Work email" />
+              <input className="input" type="email" placeholder="you@company.com" aria-label="Work email" />
               <button className="btn btn-primary" type="submit">Create a purse</button>
             </form>
             <div className="hero-proof fade-up d3">
@@ -44,6 +46,9 @@ export default function Home() {
               <span>·</span>
               <span>One tap refunds</span>
             </div>
+           </div>
+          </div>
+          <div className="container">
             <HeroDemo />
           </div>
         </section>
