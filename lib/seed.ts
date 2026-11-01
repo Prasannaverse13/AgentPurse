@@ -18,7 +18,7 @@ export function seed(): DB {
   const H = 3600_000;
 
   const agents: Agent[] = [
-    { id: 'ag_shop', name: 'Shopper', kind: 'Buys office supplies', initials: 'SH', key: DEMO_KEYS.shopper, dailyCap: 200, autoApproveLimit: 100, status: 'active', shops: ['amazon', 'staples', 'target'], createdAt: iso(30 * 24 * H) },
+    { id: 'ag_shop', name: 'Shopper', kind: 'Buys office supplies', initials: 'SH', key: DEMO_KEYS.shopper, dailyCap: 200, autoApproveLimit: 100, status: 'active', shops: ['amazon', 'staples', 'target', 'walmart', 'bestbuy', 'wayfair', 'vari', 'officedepot'], createdAt: iso(30 * 24 * H) },
     { id: 'ag_trip', name: 'Trip Planner', kind: 'Books travel', initials: 'TP', key: DEMO_KEYS.trip, dailyCap: 800, autoApproveLimit: 300, status: 'active', shops: ['expedia', 'airbnb'], createdAt: iso(30 * 24 * H) },
     { id: 'ag_ops', name: 'Ops Bot', kind: 'Pays API and SaaS bills', initials: 'OP', key: DEMO_KEYS.ops, dailyCap: 150, autoApproveLimit: 60, status: 'active', shops: ['openai', 'render', 'vercel', 'anthropic'], createdAt: iso(30 * 24 * H) },
     { id: 'ag_gift', name: 'Gift Agent', kind: 'Sends team gifts', initials: 'GA', key: DEMO_KEYS.gift, dailyCap: 100, autoApproveLimit: 50, status: 'frozen', frozenReason: 'Spend jumped 4x in one hour', shops: ['etsy'], createdAt: iso(30 * 24 * H) },
