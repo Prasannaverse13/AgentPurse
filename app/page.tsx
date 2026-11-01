@@ -35,7 +35,7 @@ export default function Home() {
               AgentPurse gives every AI agent its own PayPal budget, spend rules and a direct line to you.
               Small buys go through. Risky ones wait for your yes.
             </p>
-            <form className="hero-form fade-up d3" action="/dashboard">
+            <form className="hero-form fade-up d3" action="/connect-paypal">
               <input className="input" type="email" placeholder="you@company.com" aria-label="Work email" />
               <button className="btn btn-primary" type="submit">Create a purse</button>
             </form>
@@ -214,7 +214,7 @@ export default function Home() {
                   It never touches your PayPal keys.
                 </p>
                 <div className="row gap-8" style={{ marginTop: 8 }}>
-                  <Link href="/dashboard" className="btn btn-primary">Get an agent key</Link>
+                  <Link href="/connect-paypal" className="btn btn-primary">Get an agent key</Link>
                   <a href="#faq" className="btn btn-ghost">Read the docs</a>
                 </div>
               </div>
@@ -296,7 +296,7 @@ export default function Home() {
               <div className="orb" style={{ width: 96, height: 96 }} />
               <h2 className="h1" style={{ maxWidth: 720 }}>Let your agents shop. Stay in charge.</h2>
               <p className="lead" style={{ maxWidth: 520 }}>Create a purse in two minutes with the PayPal sandbox.</p>
-              <Link href="/dashboard" className="btn btn-primary">Create a purse</Link>
+              <Link href="/connect-paypal" className="btn btn-primary">Create a purse</Link>
             </div>
           </div>
         </section>
@@ -312,7 +312,7 @@ export default function Home() {
             <a href="#how">How it works</a>
             <a href="#features">Features</a>
             <a href="#mcp">Developers</a>
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/connect-paypal">Dashboard</Link>
           </div>
         </div>
       </footer>

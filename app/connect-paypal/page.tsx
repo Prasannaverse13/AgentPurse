@@ -1,4 +1,7 @@
 import Logo from '@/components/Logo';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { COOKIE, readSession } from '@/lib/session';
 import '../landing.css';
 
 export const dynamic = 'force-dynamic';
@@ -12,6 +15,8 @@ const errors: Record<string, string> = {
 
 export default async function ConnectPaypal({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const q = await searchParams;
+  // Already connected in this browser session: go straight in (not right after logging out).
+  if (!q.bye && (await readSession((await cookies()).get(COOKIE)?.value))) redirect('/dashboard');
   const demo = process.env.ALLOW_DEMO_LOGIN === 'true';
   const sandbox = process.env.PAYPAL_ENV !== 'live';
 

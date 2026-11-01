@@ -25,8 +25,8 @@ export default function Nav() {
             <a href="#faq">FAQ</a>
           </div>
           <div className="nav-right">
-            <Link href="/dashboard" className="btn btn-ghost btn-sm nav-open">Open dashboard</Link>
-            <Link href="/dashboard" className="btn btn-primary btn-sm nav-cta">Get started</Link>
+            <Link href="/connect-paypal" className="btn btn-ghost btn-sm nav-open">Open dashboard</Link>
+            <Link href="/connect-paypal" className="btn btn-primary btn-sm nav-cta">Get started</Link>
           </div>
         </nav>
       </div>
