@@ -143,7 +143,7 @@ export async function ask(question: string, history: Turn[] = []): Promise<{ rep
       signal: AbortSignal.timeout(45_000),
     }).catch(() => null);
     if (!res) return { reply: `Could not reach OpenAI. Here is the plain view:\n${fallback()}`, steps, mode: 'heuristic' };
-    if (!res.ok) return { reply: `The AI call failed (${res.status}). Here is the plain view:\n${fallback()}`, steps, mode: 'heuristic' };
+    if (!res.ok) { const why = (await res.text().catch(() => '')).slice(0, 300); console.error('treasurer openai error', res.status, why); return { reply: `The AI call failed (${res.status}). Here is the plain view:\n${fallback()}`, steps, mode: 'heuristic' }; }
     const msg = ((await res.json()) as { choices: { message: Msg & { content: string | null; tool_calls?: ToolCall[] } }[] }).choices[0].message;
     messages.push(msg);
     if (!msg.tool_calls?.length) return { reply: (msg.content || '').trim() || 'No answer.', steps, mode: 'openai' };
