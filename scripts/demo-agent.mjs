@@ -12,7 +12,7 @@ const BASE = (process.env.AGENTPURSE_URL || 'http://localhost:3000').replace(/\/
 const KEY = process.env.AGENT_KEY || 'ap_test_shopper_7f3k';
 const AI_KEY = process.env.OPENAI_API_KEY || '';
 const MODEL = process.env.AI_MODEL || 'gpt-5.6-luna';
-const task = process.argv.slice(2).join(' ') || 'Restock the office: 10 reams of paper, 2 kg of coffee, and a standing desk.';
+const task = process.argv.slice(2).join(' ') || 'Restock the office: a ream of paper, 2 kg of coffee, and a standing desk.';
 
 const purse = async (method, path, body) => {
   const r = await fetch(`${BASE}/api/agent${path}`, {
@@ -77,7 +77,7 @@ async function scripted() {
   say('agent', `Budget: $${b.leftToday} left today, auto approve up to $${b.autoApproveLimit}. Shops: ${b.allowedShops.join(', ')}`);
 
   const rank = { auto: 0, ask: 1, block: 2 };
-  for (const need of ['copy paper 10 reams', 'coffee beans 2 kg', 'standing desk']) {
+  for (const need of ['printer paper 1 ream', 'coffee beans 2 kg', 'standing desk']) {
     const found = await search(need);
     if (found.error) throw new Error(found.error);
     const products = found.results || [];
