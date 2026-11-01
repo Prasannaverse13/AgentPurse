@@ -25,3 +25,9 @@ services:
         sync: false
       - key: CHANNEL3_API_KEY
         sync: false
+      - key: DIGEST_TOKEN
+        sync: false
+      - key: RENDER_API_KEY
+        sync: false
+      - key: WORKFLOW_SLUG
+        sync: false

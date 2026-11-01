@@ -111,6 +111,23 @@ The Studio page uses AG Studio (ag-studio-react) on the purse data. Agents and s
 
 The Timeline page uses Bryntum Scheduler. One row per agent wallet, one bar per payment request, coloured by status. Click a bar for the reason and the rule that decided it. The repo uses the Bryntum trial package (`@bryntum/scheduler` aliased to `@bryntum/scheduler-trial`), which is for evaluation only. Swap in a licensed copy for production.
 
+## Render Workflows (weekly digest)
+
+The `workflows/` folder is a separate Render Workflow service. One task, `buildWeeklyDigest`, runs the steps below. Render retries a failed step on its own and runs the two reads at the same time.
+
+- `fetchPurse` reads wallet state and the full ledger.
+- `fetchRecap` asks AgentPurse AI for the plain words recap.
+- `savePurseDigest` posts the finished digest back to the dashboard.
+
+The Overview page shows the latest digest and a **Run on Render Workflows** button.
+
+Set up:
+
+1. Render Dashboard, **New > Workflow**. Link this repo. Root directory `workflows`. Language Node.
+2. Build command `npm install && npm run build`. Start command `npm start`.
+3. Env on the workflow: `AGENTPURSE_URL` (your web service URL) and `DIGEST_TOKEN` (any long random string).
+4. Env on the web service: the same `DIGEST_TOKEN`, a `RENDER_API_KEY` (Account settings, API keys) and `WORKFLOW_SLUG` (the workflow slug shown in the dashboard).
+
 ## Deploy on Render
 
 1. Push this repo to GitHub.

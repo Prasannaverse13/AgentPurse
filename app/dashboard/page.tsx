@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import Topbar from '@/components/Topbar';
 import ApprovalCard, { StatusBadge } from '@/components/ApprovalCard';
 import FundCard from '@/components/FundCard';
+import DigestCard from '@/components/DigestCard';
 import { api, useApi, usd, ago } from '@/lib/client';
 import type { State } from '@/lib/state';
 
@@ -33,6 +34,8 @@ export default function Overview() {
           <p className="body ink" style={{ fontSize: 17, lineHeight: 1.55 }}>{summary ?? 'Writing your summary…'}</p>
         </div>
       </div>
+
+      <DigestCard />
 
       <div className="grid-4" style={{ marginTop: 24 }}>
         <div className="card">

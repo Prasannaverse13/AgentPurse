@@ -15,6 +15,7 @@
     "@fontsource/hedvig-letters-serif": "^5.3.1",
     "@fontsource/inter": "^5.3.0",
     "@paypal/agent-toolkit": "^1.11.0",
+    "@renderinc/sdk": "^1.6.0",
     "ag-grid-community": "^33.3.2",
     "ag-grid-react": "^33.3.2",
     "ag-studio-react": "^3.0.0",
