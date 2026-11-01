@@ -1,0 +1,64 @@
+/* AgentPurse design tokens. Source: Dialog style reference (DESIGN.md). */
+:root {
+  /* Colors */
+  --color-tangerine-tag: #f69251; /* CTA only */
+  --color-midnight-ink: #181825;
+  --color-graphite: #484758;
+  --color-deep-slate: #242433;
+  --color-carbon: #000000;
+  --color-stone: #636363;
+  --color-pebble: #949494;
+  --color-ash: #8b8b8b;
+  --color-silver: #b2b2b2;
+  --color-fog: #f7f7f7;
+  --color-snow: #ffffff;
+  --color-peach-whisper: #fad7c1; /* decorative only */
+  --gradient-peach-whisper: linear-gradient(rgba(255, 219, 184, 0.06) 0%, rgba(255, 255, 255, 0.03) 100%);
+  --color-dusty-rose: #c97b84;
+  --color-line: rgba(24, 24, 37, 0.08);
+
+  /* Fonts. PP Radio Grotesk Light is licensed; DM Sans 300 is the documented substitute. */
+  --font-display: 'PP Radio Grotesk Light', 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-inter: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Type scale */
+  --text-caption: 12px;
+  --text-body: 16px;
+  --text-subheading: 18px;
+  --text-heading-sm: 24px;
+  --text-heading: 32px;
+  --text-heading-lg: 50px;
+  --text-display: 70px;
+
+  /* Spacing */
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
+  --spacing-20: 20px;
+  --spacing-24: 24px;
+  --spacing-32: 32px;
+  --spacing-40: 40px;
+  --spacing-48: 48px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
+  --spacing-128: 128px;
+
+  /* Layout */
+  --page-max-width: 1200px;
+
+  /* Radius */
+  --radius-cards: 24px;
+  --radius-small: 8px;
+  --radius-cardinner: 12px;
+  --radius-badges: 100px;
+  --radius-buttons: 28px;
+  --radius-overlays: 32px;
+  --radius-inputs: 0px;
+
+  /* Shadows */
+  --shadow-subtle: rgba(24, 24, 37, 0.12) 0px 2px 3px -2px;
+  --shadow-xl: rgba(247, 247, 247, 0.5) 0px -40px 40px 0px;
+  --shadow-subtle-2: rgba(0, 0, 0, 0.04) 0px 1px 2px 0px, rgba(0, 0, 0, 0.02) 0px 2px 4px 0px, rgba(0, 0, 0, 0.02) 0px 4px 8px 0px;
+}

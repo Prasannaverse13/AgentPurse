@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: agentpurse
+    runtime: node
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/config
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_WEBHOOK_ID
+        sync: false
+      - key: AG_STUDIO_LICENSE
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CHANNEL3_API_KEY
+        sync: false
