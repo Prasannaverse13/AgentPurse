@@ -6,7 +6,7 @@ const INK = '#181825';
 const MUTED = '#636363';
 const LINE = 'rgba(24,24,37,0.08)';
 const line = { width: 1, color: LINE };
-const PALETTE = ['#181825', '#6f7bf7', '#4cb89a', '#9a9a9a', '#c97b84', '#e0b455', '#5aa5d6', '#8b6fd1', '#b5845a', '#3d6e63'];
+const PALETTE = ['#12372a', '#8f86f5', '#4cb89a', '#9a9a9a', '#c97b84', '#e0b455', '#5aa5d6', '#8b6fd1', '#b5845a', '#3d6e63'];
 
 const palette = Object.fromEntries(
   PALETTE.flatMap((c, i) => [
@@ -23,24 +23,24 @@ export const purseTheme = studioTheme.withParams({
   subtleTextColor: MUTED,
   backgroundColor: '#ffffff',
   borderColor: LINE,
-  accentColor: INK,
+  accentColor: '#12372a',
   iconColor: INK,
   rowHoverColor: '#f7f7f7',
 
   studioWrapperBorder: false,
   studioWrapperBorderRadius: 0,
   studioWrapperSpacing: 0,
-  studioWrapperBackgroundColor: '#f7f7f7',
+  studioWrapperBackgroundColor: 'transparent',
   studioCanvasBorder: false,
   studioCanvasBorderRadius: 0,
   studioCanvasShadow: false,
-  studioCanvasBackgroundColor: '#f7f7f7',
+  studioCanvasBackgroundColor: 'transparent',
   studioCanvasPadding: 20,
   studioCanvasRowHeight: 18,
 
-  studioWidgetBackgroundColor: '#ffffff',
-  studioWidgetBorder: line,
-  studioWidgetBorderRadius: 24,
+  studioWidgetBackgroundColor: 'rgba(255,255,255,0.62)',
+  studioWidgetBorder: { width: 1, color: 'rgba(255,255,255,0.9)' },
+  studioWidgetBorderRadius: 28,
   studioWidgetPadding: 14,
   studioWidgetTitleFontFamily: '"DM Sans", Inter, sans-serif',
   studioWidgetTitleFontSize: 16,
@@ -50,7 +50,7 @@ export const purseTheme = studioTheme.withParams({
   studioWidgetCaptionTextColor: MUTED,
   studioWidgetResizeBorderColor: INK,
 
-  studioPanelContainerBackgroundColor: '#ffffff',
+  studioPanelContainerBackgroundColor: 'rgba(255,255,255,0.8)',
   studioPanelContainerBorder: line,
   studioPanelDividerColor: LINE,
   studioPanelDividerActiveColor: INK,
@@ -58,7 +58,7 @@ export const purseTheme = studioTheme.withParams({
   studioToggleButtonActiveBorderColor: INK,
   studioToggleButtonActiveColor: INK,
 
-  gridHeaderBackgroundColor: '#ffffff',
+  gridHeaderBackgroundColor: 'transparent',
   gridHeaderTextColor: MUTED,
   gridHeaderFontWeight: 600,
   gridRowHeight: 40,
