@@ -1,6 +1,6 @@
 // PayPal webhook. Payout events arrive here after the payment call returns.
 // A payout that is returned, blocked, failed or cancelled gives the money back to the purse.
-import { read, write, log, now, round2 } from '@/lib/db';
+import { read, write, log, now, round2, ownerForPayoutItem, runAs } from '@/lib/db';
 import { paypalMode, verifyWebhook } from '@/lib/paypal';
 import { handle, json } from '@/lib/http';
 
@@ -41,8 +41,14 @@ export const POST = handle(async (req: Request) => {
   const status = (event.resource?.transaction_status || type.split('.').pop() || '').toUpperCase();
   if (!itemId) return json({ ok: true, ignored: 'no payout item' });
 
-  const found = read().txns.find((t) => t.paypal?.itemId === itemId);
-  if (!found) return json({ ok: true, ignored: 'unknown payout item' });
+  // The payout item tells us which purse it belongs to.
+  const owner = ownerForPayoutItem(itemId);
+  if (!owner) return json({ ok: true, ignored: 'unknown payout item' });
+  return runAs(owner, () => applyPayoutEvent(itemId, status));
+});
+
+function applyPayoutEvent(itemId: string, status: string) {
+  const found = read().txns.find((t) => t.paypal?.itemId === itemId)!;
 
   const give = GIVE_BACK[status];
   write((db) => {
@@ -59,4 +65,4 @@ export const POST = handle(async (req: Request) => {
     }
   });
   return json({ ok: true, txn: found.id, status });
-});
+}

@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import { AsyncLocalStorage } from 'node:async_hooks';
 import type { DB } from './types';
 import { seed } from './seed';
 
@@ -9,29 +10,51 @@ import { seed } from './seed';
 
 const DATA_DIR = process.env.DATA_DIR || path.join(process.cwd(), 'data');
 const FILE = path.join(DATA_DIR, 'db.json');
+const MAX_PURSES = 300;
 
-type G = { __ap_db?: DB };
+// One purse per PayPal login. The shared demo account uses the owner id 'demo'.
+type Store = { purses: Record<string, DB> };
+type G = { __ap_store?: Store; __ap_als?: AsyncLocalStorage<string> };
 const g = globalThis as unknown as G;
+const als = (g.__ap_als ??= new AsyncLocalStorage<string>());
 
-function load(): DB {
-  if (g.__ap_db) return g.__ap_db;
+export const DEMO_OWNER = 'demo';
+export const currentOwner = () => als.getStore() ?? DEMO_OWNER;
+// Everything inside fn reads and writes this owner's purse.
+export const runAs = <T>(owner: string, fn: () => T): T => als.run(owner, fn);
+
+function store(): Store {
+  if (g.__ap_store) return g.__ap_store;
   try {
-    g.__ap_db = JSON.parse(fs.readFileSync(FILE, 'utf8')) as DB;
+    const raw = JSON.parse(fs.readFileSync(FILE, 'utf8'));
+    // Old single purse files move into the demo purse.
+    g.__ap_store = raw && raw.purses ? (raw as Store) : { purses: { [DEMO_OWNER]: raw as DB } };
   } catch {
-    g.__ap_db = seed();
-    persist();
+    g.__ap_store = { purses: {} };
   }
-  return g.__ap_db!;
+  return g.__ap_store;
 }
 
 function persist() {
   try {
     fs.mkdirSync(DATA_DIR, { recursive: true });
-    fs.writeFileSync(FILE + '.tmp', JSON.stringify(g.__ap_db, null, 2));
+    fs.writeFileSync(FILE + '.tmp', JSON.stringify(g.__ap_store, null, 2));
     fs.renameSync(FILE + '.tmp', FILE);
   } catch (e) {
     console.warn('[db] could not write file, keeping data in memory', e);
   }
+}
+
+function load(): DB {
+  const s = store();
+  const owner = currentOwner();
+  if (!s.purses[owner]) {
+    const keys = Object.keys(s.purses).filter((k) => k !== DEMO_OWNER);
+    if (keys.length >= MAX_PURSES) delete s.purses[keys[0]]; // drop the oldest private purse
+    s.purses[owner] = seed(owner);
+    persist();
+  }
+  return s.purses[owner];
 }
 
 export function read(): DB {
@@ -46,9 +69,22 @@ export function write<T>(fn: (db: DB) => T): T {
   return out;
 }
 
+// Resets the current owner's purse only.
 export function reset() {
-  g.__ap_db = seed();
+  store().purses[currentOwner()] = seed(currentOwner());
   persist();
+}
+
+// Agent keys are unique to one purse, so a key tells us whose purse to open.
+export function ownerForAgentKey(key: string | null | undefined): string | null {
+  if (!key) return null;
+  for (const [owner, db] of Object.entries(store().purses)) if (db.agents.some((a) => a.key === key)) return owner;
+  return null;
+}
+
+export function ownerForPayoutItem(itemId: string): string | null {
+  for (const [owner, db] of Object.entries(store().purses)) if (db.txns.some((t) => t.paypal?.itemId === itemId)) return owner;
+  return null;
 }
 
 export function log(db: DB, text: string) {

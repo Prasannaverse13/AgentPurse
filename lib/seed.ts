@@ -1,3 +1,4 @@
+import crypto from 'node:crypto';
 import type { Agent, DB, Rule, Txn, TxnStatus } from './types';
 
 // Demo keys are fixed so the MCP config in the README works out of the box.
@@ -12,7 +13,7 @@ export const DEMO_KEYS = {
 export const merchantEmail = (merchant: string) =>
   `${merchant.toLowerCase().replace(/[^a-z0-9]+/g, '')}@merchant.agentpurse.dev`;
 
-export function seed(): DB {
+export function seed(owner = 'demo'): DB {
   const t0 = Date.now();
   const iso = (msAgo: number) => new Date(t0 - msAgo).toISOString();
   const H = 3600_000;
@@ -23,6 +24,9 @@ export function seed(): DB {
     { id: 'ag_ops', name: 'Ops Bot', kind: 'Pays API and SaaS bills', initials: 'OP', key: DEMO_KEYS.ops, dailyCap: 150, autoApproveLimit: 60, status: 'active', shops: ['openai', 'render', 'vercel', 'anthropic'], createdAt: iso(30 * 24 * H) },
     { id: 'ag_gift', name: 'Gift Agent', kind: 'Sends team gifts', initials: 'GA', key: DEMO_KEYS.gift, dailyCap: 100, autoApproveLimit: 50, status: 'frozen', frozenReason: 'Spend jumped 4x in one hour', shops: ['etsy'], createdAt: iso(30 * 24 * H) },
   ];
+
+  // Private purses get their own agent keys. Only the shared demo purse keeps the fixed ones.
+  if (owner !== 'demo') for (const a of agents) a.key = `ap_${crypto.randomBytes(12).toString('hex')}`;
 
   const rules: Rule[] = [
     { id: 'r1', agentId: null, text: 'Ask me before any buy over 300 dollars', kind: 'ask_over', params: { value: 300 }, on: true, parsedBy: 'seed', createdAt: iso(20 * 24 * H) },
