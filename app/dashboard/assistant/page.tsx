@@ -14,6 +14,9 @@ const ideas = [
   'List my latest PayPal transactions',
 ];
 
+// Show **bold** from the AI reply as real bold text.
+const bold = (s: string) => s.split(/(\*\*[^*]+\*\*)/g).map((x, i) => (x.startsWith('**') && x.endsWith('**') ? <strong key={i}>{x.slice(2, -2)}</strong> : x));
+
 export default function Assistant() {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [text, setText] = useState('');
@@ -49,7 +52,7 @@ export default function Assistant() {
         )}
         {turns.map((t, i) => (
           <div key={i} className={t.role === 'user' ? 'inner' : 'stack gap-8'} style={t.role === 'user' ? { alignSelf: 'flex-end', maxWidth: '85%' } : undefined}>
-            <span className="small ink" style={{ whiteSpace: 'pre-wrap' }}>{t.content}</span>
+            <span className="small ink" style={{ whiteSpace: 'pre-wrap' }}>{bold(t.content)}</span>
             {t.steps?.length ? (
               <div className="row gap-8" style={{ flexWrap: 'wrap' }}>
                 {t.steps.map((s, k) => (
