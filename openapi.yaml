@@ -1,0 +1,164 @@
+openapi: 3.0.3
+info:
+  title: AgentPurse Agent API
+  version: 0.1.0
+  description: |
+    The API an AI agent uses to spend from its AgentPurse wallet. Every spend request runs
+    through the owner's rule engine first. Small safe buys are paid at once with PayPal Payouts,
+    risky ones wait for the owner, and rule breaking ones are blocked.
+    Use it from code, from any MCP client (see mcp/server.mjs) or generate an SDK with APIMatic.
+  license: { name: MIT, url: https://opensource.org/licenses/MIT }
+servers:
+  - url: https://agentpurse-k4bu.onrender.com
+    description: Live demo (PayPal sandbox)
+  - url: http://localhost:3000
+    description: Local
+security:
+  - agentKey: []
+paths:
+  /api/agent/budget:
+    get:
+      operationId: getBudget
+      summary: See caps, what is left today, allowed shops and rules
+      responses:
+        '200': { description: Budget, content: { application/json: { schema: { $ref: '#/components/schemas/Budget' } } } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/agent/search:
+    get:
+      operationId: searchProducts
+      summary: Find a product with Channel3 and preview what the rules will do for each offer
+      parameters:
+        - { name: q, in: query, required: true, schema: { type: string }, example: standing desk }
+        - { name: maxPrice, in: query, schema: { type: number } }
+        - { name: limit, in: query, schema: { type: integer, minimum: 1, maximum: 10, default: 5 } }
+      responses:
+        '200': { description: Products with offers, content: { application/json: { schema: { $ref: '#/components/schemas/SearchResult' } } } }
+        '400': { description: q is missing }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '502': { description: Channel3 failed }
+  /api/agent/spend:
+    post:
+      operationId: requestSpend
+      summary: Ask to pay a merchant
+      description: Returns 200 when paid, 202 when waiting for the owner, 403 when blocked.
+      requestBody:
+        required: true
+        content: { application/json: { schema: { $ref: '#/components/schemas/SpendRequest' } } }
+      responses:
+        '200': { description: Paid, content: { application/json: { schema: { $ref: '#/components/schemas/Request' } } } }
+        '202': { description: Waiting for the owner, content: { application/json: { schema: { $ref: '#/components/schemas/Request' } } } }
+        '403': { description: Blocked by a rule, content: { application/json: { schema: { $ref: '#/components/schemas/Request' } } } }
+        '400': { description: Bad input }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/agent/requests/{id}:
+    get:
+      operationId: getRequest
+      summary: Check a request that was waiting for the owner
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Request, content: { application/json: { schema: { $ref: '#/components/schemas/Request' } } } }
+        '404': { description: No such request }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+  /api/agent/refund:
+    post:
+      operationId: requestRefund
+      summary: Ask the owner to refund a paid item
+      description: Agents can only ask. The owner makes the final call on the ledger.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [requestId, why]
+              properties: { requestId: { type: string }, why: { type: string } }
+      responses:
+        '200': { description: Request sent, content: { application/json: { schema: { $ref: '#/components/schemas/Request' } } } }
+        '409': { description: Only paid items can be refunded }
+        '403': { description: Not your payment }
+components:
+  securitySchemes:
+    agentKey:
+      type: http
+      scheme: bearer
+      description: The agent key from the Agent wallets page. A key opens only that agent's purse.
+  responses:
+    Unauthorized:
+      description: Unknown agent key
+      content: { application/json: { schema: { type: object, properties: { error: { type: string } } } } }
+  schemas:
+    SpendRequest:
+      type: object
+      required: [amount, merchant, item]
+      properties:
+        amount: { type: number, minimum: 0.01, maximum: 10000, description: Price in USD }
+        merchant: { type: string, example: Staples }
+        item: { type: string, example: Printer paper }
+        reason: { type: string, example: Office is out of paper }
+        merchantEmail: { type: string, format: email, description: PayPal email of the shop. Defaults to a sandbox address. }
+        productUrl: { type: string, format: uri }
+        image: { type: string, format: uri }
+    Check:
+      type: object
+      properties:
+        rule: { type: string }
+        ok: { type: boolean }
+        effect: { type: string, enum: [pass, ask, block, freeze] }
+    Request:
+      type: object
+      properties:
+        id: { type: string }
+        status: { type: string, enum: [pending, paid, blocked, declined, refunded, failed] }
+        item: { type: string }
+        merchant: { type: string }
+        amount: { type: number }
+        currency: { type: string, example: USD }
+        flag: { type: string, nullable: true, description: Short reason it waited or was blocked }
+        decidedBy: { type: string, nullable: true, enum: [rules, owner] }
+        checks: { type: array, items: { $ref: '#/components/schemas/Check' } }
+        paypal:
+          type: object
+          nullable: true
+          properties: { payoutBatchId: { type: string }, payoutItemId: { type: string }, status: { type: string } }
+        message: { type: string }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    Budget:
+      type: object
+      properties:
+        agent: { type: string }
+        status: { type: string, enum: [active, frozen] }
+        frozenReason: { type: string, nullable: true }
+        dailyCap: { type: number }
+        spentToday: { type: number }
+        leftToday: { type: number }
+        autoApproveLimit: { type: number }
+        allowedShops: { type: array, items: { type: string } }
+        rules: { type: array, items: { type: string } }
+    Offer:
+      type: object
+      properties:
+        merchant: { type: string }
+        domain: { type: string }
+        price: { type: number }
+        currency: { type: string }
+        url: { type: string, format: uri }
+        inStock: { type: boolean }
+        rules: { type: string, enum: [auto, ask, block], description: auto pays at once, ask needs the owner, block will be refused }
+        rulesNote: { type: string }
+    SearchResult:
+      type: object
+      properties:
+        source: { type: string, enum: [channel3, channel3-demo-catalog] }
+        query: { type: string }
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: string }
+              title: { type: string }
+              brand: { type: string, nullable: true }
+              image: { type: string, nullable: true }
+              offers: { type: array, items: { $ref: '#/components/schemas/Offer' } }
